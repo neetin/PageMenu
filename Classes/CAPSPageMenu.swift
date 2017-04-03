@@ -405,8 +405,21 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
             
             // Set up menu item for menu scroll view
             var menuItemFrame : CGRect = CGRect()
+          
+          if menuItemWidthBasedOnTitleTextWidth {
+            let controllerTitle : String? = controller.title
             
-            if useMenuLikeSegmentedControl {
+            let titleText : String = controllerTitle != nil ? controllerTitle! : "Menu \(Int(index) + 1)"
+            
+            let itemWidthRect : CGRect = (titleText as NSString).boundingRect(with: CGSize(width: 1000, height: 1000), options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: [NSFontAttributeName:menuItemFont], context: nil)
+            
+            menuItemWidth = itemWidthRect.width
+            
+            menuItemFrame = CGRect(x: totalMenuItemWidthIfDifferentWidths + menuMargin + (menuMargin * index), y: 0.0, width: menuItemWidth, height: menuHeight)
+            
+            totalMenuItemWidthIfDifferentWidths += itemWidthRect.width
+            menuItemWidths.append(itemWidthRect.width)
+          } else if useMenuLikeSegmentedControl {
                 //**************************拡張*************************************
                 if menuItemMargin > 0 {
                     let marginSum = menuItemMargin * CGFloat(controllerArray.count + 1)
@@ -416,19 +429,6 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
                     menuItemFrame = CGRect(x: self.view.frame.width / CGFloat(controllerArray.count) * CGFloat(index), y: 0.0, width: CGFloat(self.view.frame.width) / CGFloat(controllerArray.count), height: menuHeight)
                 }
                 //**************************拡張ここまで*************************************
-            } else if menuItemWidthBasedOnTitleTextWidth {
-                let controllerTitle : String? = controller.title
-                
-                let titleText : String = controllerTitle != nil ? controllerTitle! : "Menu \(Int(index) + 1)"
-                
-                let itemWidthRect : CGRect = (titleText as NSString).boundingRect(with: CGSize(width: 1000, height: 1000), options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: [NSFontAttributeName:menuItemFont], context: nil)
-                
-                menuItemWidth = itemWidthRect.width
-                
-                menuItemFrame = CGRect(x: totalMenuItemWidthIfDifferentWidths + menuMargin + (menuMargin * index), y: 0.0, width: menuItemWidth, height: menuHeight)
-                
-                totalMenuItemWidthIfDifferentWidths += itemWidthRect.width
-                menuItemWidths.append(itemWidthRect.width)
             } else {
                 if centerMenuItems && index == 0.0  {
                     startingMenuMargin = ((self.view.frame.width - ((CGFloat(controllerArray.count) * menuItemWidth) + (CGFloat(controllerArray.count - 1) * menuMargin))) / 2.0) -  menuMargin
